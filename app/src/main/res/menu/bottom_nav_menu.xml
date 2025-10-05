@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/navigation_mytru"
+
+        android:title="myTRU" />
+    <item
+        android:id="@+id/navigation_studygroups"
+
+        android:title="StudyGroups" />
+    <item
+        android:id="@+id/navigation_news"
+
+        android:title="News" />
+    <item
+        android:id="@+id/navigation_wolfpack"
+
+        android:title="Wolfpack Schedule" />
+    <item
+        android:id="@+id/navigation_settings"
+
+        android:title="Settings" />
+</menu>
