@@ -3,10 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:layout_marginTop="10dp">
-    <TextView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:text="MYTRU"/>
+    android:layout_marginTop="20dp">
+
+    <WebView
+        android:id="@+id/mytru_webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </LinearLayout>
