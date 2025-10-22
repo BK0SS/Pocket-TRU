@@ -17,6 +17,8 @@ public class StudyGroupsFragment extends Fragment {
     private RecyclerView recyclerView;
     private CourseListRecViewAdapter adapter;
     private List<CourseModel> studyGroupList;
+    private ArrayList<CourseModel> courseList;
+    private DBHandler db;
 
     @Nullable
     @Override
@@ -29,14 +31,20 @@ public class StudyGroupsFragment extends Fragment {
 
         // Initialize  study group list
         studyGroupList = new ArrayList<>();
+        courseList = new ArrayList<>();
+
+        db = new DBHandler(StudyGroupsFragment.this.getContext());
+
+        courseList = db.readCourses();
+
         // TODO: Add your logic to fetch study groups from a database
         // For now add some dummy data.
-        studyGroupList.add(new CourseModel("CS_101", "Introduction to Computer Science", "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip"));
-        studyGroupList.add(new CourseModel("MATH_250B", "Advanced Calculus", "Students cover bla bla bla"));
-        studyGroupList.add(new CourseModel("PHYS_225", "Introduction to Physics", "Students cover bla bla bla"));
+//        studyGroupList.add(new CourseModel("CS_101", "Introduction to Computer Science", "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip"));
+//        studyGroupList.add(new CourseModel("MATH_250B", "Advanced Calculus", "Students cover bla bla bla"));
+//        studyGroupList.add(new CourseModel("PHYS_225", "Introduction to Physics", "Students cover bla bla bla"));
 
 
-        adapter = new CourseListRecViewAdapter(studyGroupList, getContext());
+        adapter = new CourseListRecViewAdapter(courseList, getContext());
         recyclerView.setAdapter(adapter);
 
         return view;
