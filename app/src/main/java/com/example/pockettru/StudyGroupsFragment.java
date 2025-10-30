@@ -1,13 +1,17 @@
 package com.example.pockettru;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import androidx.fragment.app.Fragment;
@@ -17,6 +21,9 @@ public class StudyGroupsFragment extends Fragment {
     private RecyclerView recyclerView;
     private CourseListRecViewAdapter adapter;
     private List<CourseModel> studyGroupList;
+    private ArrayList<CourseModel> courseList;
+    private DBHandler db;
+    private CardView courseRow;
 
     @Nullable
     @Override
@@ -29,14 +36,28 @@ public class StudyGroupsFragment extends Fragment {
 
         // Initialize  study group list
         studyGroupList = new ArrayList<>();
+        courseList = new ArrayList<>();
+
+        db = new DBHandler(StudyGroupsFragment.this.getContext());
+
+        try{
+            db.createDataBase();
+            courseList = db.readCourses();
+            Log.d("StudyGroupsFragment", "Courses loaded from DB: " + courseList.size());
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+
+
+
         // TODO: Add your logic to fetch study groups from a database
         // For now add some dummy data.
-        studyGroupList.add(new CourseModel("CS_101", "Introduction to Computer Science", "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip"));
-        studyGroupList.add(new CourseModel("MATH_250B", "Advanced Calculus", "Students cover bla bla bla"));
-        studyGroupList.add(new CourseModel("PHYS_225", "Introduction to Physics", "Students cover bla bla bla"));
+//        studyGroupList.add(new CourseModel("CS_101", "Introduction to Computer Science", "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip"));
+//        studyGroupList.add(new CourseModel("MATH_250B", "Advanced Calculus", "Students cover bla bla bla"));
+//        studyGroupList.add(new CourseModel("PHYS_225", "Introduction to Physics", "Students cover bla bla bla"));
 
 
-        adapter = new CourseListRecViewAdapter(studyGroupList, getContext());
+        adapter = new CourseListRecViewAdapter(courseList, getContext());
         recyclerView.setAdapter(adapter);
 
         return view;
