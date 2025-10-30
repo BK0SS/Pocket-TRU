@@ -29,7 +29,7 @@ public class Auth extends AppCompatActivity {
         });
 
         // Check if the user is already logged in
-        FirebaseAuth auth = FirebaseAuth.getInstance();
+        final FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
             startActivity(new Intent(this, MainActivity.class));
             finish();
@@ -46,26 +46,30 @@ public class Auth extends AppCompatActivity {
         EditText emailInput = findViewById(R.id.email_input);
         EditText passwordInput = findViewById(R.id.password_input);
 
-       // Login button click listener code for logging in
-       loginButton.setOnClickListener(new View.OnClickListener() {
+        // Login button click listener code for logging in
+        loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String email = emailInput.getText().toString();
                 String password = passwordInput.getText().toString();
-                auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(Auth.this, task -> {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(Auth.this, "Authentication successful.", Toast.LENGTH_SHORT).show();
-                                startActivity(intent);
-                            } else {
-                                Toast.makeText(Auth.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                if (email.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(Auth.this, "Email and password cannot be empty.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-                startActivity(intent);
+                auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(Auth.this, task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(Auth.this, "Authentication successful." + email, Toast.LENGTH_SHORT).show();
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(Auth.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 
-       // Register button click listener code for going to the register page
+
+        // Register button click listener code for going to the register page
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
