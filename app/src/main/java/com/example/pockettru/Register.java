@@ -52,6 +52,7 @@ public class Register extends AppCompatActivity {
                 String password = passwordInput.getText().toString();
                 String passwordConfirm = passwordInputConfirm.getText().toString();
 
+
                 if (password.equals(passwordConfirm))
                 {
                     auth.createUserWithEmailAndPassword(email, password)

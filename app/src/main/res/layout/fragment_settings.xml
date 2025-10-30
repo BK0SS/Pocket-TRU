@@ -5,12 +5,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SettingsFragment"
-    android:layout_marginTop="10dp">
+    android:orientation="vertical">
 
-    <TextView
+    <com.google.android.material.textview.MaterialTextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Email"
+        android:id="@+id/email_text"
+        android:layout_margin="5dp"
+        android:textColor="@color/textColor"/>
+
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Settings Fragment"
-        android:textSize="24sp"/>
+        android:id = "@+id/switch_theme"
+        android:text="@string/dark_mode"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Log out"
+        android:id="@+id/logout_button"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete account :("
+        android:id="@+id/delete_button"/>
+
 
 </LinearLayout>
