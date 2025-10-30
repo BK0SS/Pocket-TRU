@@ -31,7 +31,7 @@ public class Auth extends AppCompatActivity {
         });
 
         // Check if the user is already logged in
-        FirebaseAuth auth = FirebaseAuth.getInstance();
+        final FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
             startActivity(new Intent(this, MainActivity.class));
             finish();
@@ -54,8 +54,8 @@ public class Auth extends AppCompatActivity {
         EditText emailInput = findViewById(R.id.email_input);
         EditText passwordInput = findViewById(R.id.password_input);
 
-       // Login button click listener code for logging in
-       loginButton.setOnClickListener(new View.OnClickListener() {
+        // Login button click listener code for logging in
+        loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String email = emailInput.getText().toString();
@@ -71,7 +71,8 @@ public class Auth extends AppCompatActivity {
             }
         });
 
-       // Register button click listener code for going to the register page
+
+        // Register button click listener code for going to the register page
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
