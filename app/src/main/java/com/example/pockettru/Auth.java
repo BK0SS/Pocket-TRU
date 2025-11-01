@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
+import androidx.core.splashscreen.SplashScreen;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
@@ -19,6 +20,7 @@ public class Auth extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_auth);
@@ -36,6 +38,12 @@ public class Auth extends AppCompatActivity {
             return;
         }
 
+        overridePendingTransition(R.anim.rotate1, R.anim.rotate1);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         Intent intent = new Intent(this, MainActivity.class);
         Intent registerIntent = new Intent(this, Register.class);
@@ -52,19 +60,14 @@ public class Auth extends AppCompatActivity {
             public void onClick(View v) {
                 String email = emailInput.getText().toString();
                 String password = passwordInput.getText().toString();
-                if (email.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(Auth.this, "Email and password cannot be empty.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
                 auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(Auth.this, task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(Auth.this, "Authentication successful." + email, Toast.LENGTH_SHORT).show();
-                        startActivity(intent);
-                    } else {
-                        Toast.makeText(Auth.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                            if (task.isSuccessful()) {
+                                Toast.makeText(Auth.this, "Authentication successful.", Toast.LENGTH_SHORT).show();
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(Auth.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
             }
         });
 
