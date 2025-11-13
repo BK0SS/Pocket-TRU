@@ -9,4 +9,5 @@
     <color name="colorOnSecondary">#000000</color>
     <color name="backgroundColor">#121212</color>
     <color name="textColor">#FFFFFF</color>
+    <color name="studygroupBackground">#55062B6F</color>
 </resources>

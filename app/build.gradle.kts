@@ -43,5 +43,7 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
 
 }
