@@ -1,6 +1,7 @@
 package com.example.pockettru;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +36,23 @@ public class CourseListRecViewAdapter extends RecyclerView.Adapter<CourseListRec
         holder.id.setText(courseModel.getCourseID());
         holder.name.setText(courseModel.getCourseName());
         holder.description.setText(courseModel.getDescription());
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CourseModel courseModel = courseList.get(position);
+                String courseID = courseModel.getCourseID();
+                Bundle bundle = new Bundle();
+                bundle.putString("COURSE_ID", courseID);
+
+                SGFragmnet sgFragment = new SGFragmnet();
+                sgFragment.setArguments(bundle);
+
+                ((MainActivity)context).getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, sgFragment).commit();
+
+            }
+        });
 
     }
 
