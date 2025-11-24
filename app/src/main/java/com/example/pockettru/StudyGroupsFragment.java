@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,6 +24,7 @@ public class StudyGroupsFragment extends Fragment {
     private List<CourseModel> studyGroupList;
     private ArrayList<CourseModel> courseList;
     private DBHandler db;
+    private SearchView searchView;
     private CardView courseRow;
 
     @Nullable
@@ -32,13 +34,15 @@ public class StudyGroupsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_studygroups, container, false);
 
         recyclerView = view.findViewById(R.id.courselist_recyclerview);
+        searchView = view.findViewById(R.id.search_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Initialize  study group list
         studyGroupList = new ArrayList<>();
         courseList = new ArrayList<>();
 
-        db = new DBHandler(StudyGroupsFragment.this.getContext());
+
+        db = new DBHandler(getContext());
 
         try{
             db.createDataBase();
@@ -57,10 +61,27 @@ public class StudyGroupsFragment extends Fragment {
 //        studyGroupList.add(new CourseModel("PHYS_225", "Introduction to Physics", "Students cover bla bla bla"));
 
 
-        adapter = new CourseListRecViewAdapter(courseList, getContext());
+        adapter = new CourseListRecViewAdapter(courseList, getContext(), recyclerView);
         recyclerView.setAdapter(adapter);
 
+        setupSearch();
+
         return view;
+    }
+
+    private void setupSearch(){
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                return true;
+            }
+        });
     }
 
 }
