@@ -7,10 +7,16 @@
     tools:context=".StudyGroupsFragment"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/search_view"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="StudyGroups Fragment"/>
+        android:layout_margin="10dp"
+        android:queryHint="Search for a course..."
+        android:background="@drawable/search_view_border"
+        />
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

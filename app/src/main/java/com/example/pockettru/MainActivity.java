@@ -23,6 +23,17 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
 public class MainActivity extends AppCompatActivity {
+    final Fragment wolfPackFragment = new WolfpackScheduleFragment();
+    final Fragment settingsFragment = new SettingsFragment();
+    final Fragment myTRUFragment = new MyTRUFragment();
+    final Fragment newsFragment = new NewsFragment();
+    final Fragment studyGroupsFragment = new StudyGroupsFragment();
+    final Fragment sgFragment = new SGFragmnet();
+    final FragmentManager fm = getSupportFragmentManager();
+    Fragment active;
+
+    private static final String STATE_ACTIVE_FRAGMENT_ID = "active_fragment_id";
+    private int activeFragmentId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,38 +72,64 @@ public class MainActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
 
+        if(savedInstanceState != null){
+            activeFragmentId = savedInstanceState.getInt(STATE_ACTIVE_FRAGMENT_ID, R.id.navigation_mytru);
+        } else{
+            activeFragmentId = R.id.navigation_mytru;
+        }
+
+        fm.beginTransaction().add(R.id.fragment_container, settingsFragment, "5").hide(settingsFragment).commit();
+        fm.beginTransaction().add(R.id.fragment_container, wolfPackFragment, "4").hide(wolfPackFragment).commit();
+        fm.beginTransaction().add(R.id.fragment_container, studyGroupsFragment, "3").hide(studyGroupsFragment).commit();
+        fm.beginTransaction().add(R.id.fragment_container, newsFragment, "2").hide(newsFragment).commit();
+        fm.beginTransaction().add(R.id.fragment_container, myTRUFragment, "1").hide(myTRUFragment).commit();
+
+        active = getFragmentById(activeFragmentId);
+        fm.beginTransaction().show(active).commit();
+
         bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Fragment selectedFragment = null;
                 int itemId = item.getItemId();
 
-                if (itemId == R.id.navigation_mytru) {
-                   selectedFragment = new MyTRUFragment();
-                } else if (itemId == R.id.navigation_studygroups) {
-                   selectedFragment = new StudyGroupsFragment();
-                } else if (itemId == R.id.navigation_news) {
-                    selectedFragment = new NewsFragment();
-                } else if (itemId == R.id.navigation_wolfpack) {
-                    selectedFragment = new WolfpackScheduleFragment();
-                } else if (itemId == R.id.navigation_settings) {
-                    selectedFragment = new SettingsFragment();
-                }
+                fm.popBackStack("SG_FRAG", FragmentManager.POP_BACK_STACK_INCLUSIVE);
 
-                if (selectedFragment != null) {
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, selectedFragment)
-                            .commit();
+                Fragment selectedFragment = getFragmentById(itemId);
+
+                if(selectedFragment != active){
+                    fm.beginTransaction().hide(active).show(selectedFragment).commit();
+                    active = selectedFragment;
+                    activeFragmentId = itemId;
+                } else{
+                    if (active instanceof  MyTRUFragment){
+                        ((MyTRUFragment) active).refresh();
+                    }else if( active instanceof StudyGroupsFragment){
+                        fm.beginTransaction().detach(active).attach(active).commit();
+                    }
                 }
                 return true;
             }
         });
 
-        // Set the default fragment when the app starts
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new MyTRUFragment()) // Replace with your default Fragment
-                    .commit();
+    }
+
+    private Fragment getFragmentById(int id){
+        if(id == R.id.navigation_studygroups){
+            return studyGroupsFragment;
+        }else if(id == R.id.navigation_news){
+            return newsFragment;
+        }else if(id == R.id.navigation_wolfpack){
+            return wolfPackFragment;
+        }else if(id == R.id.navigation_settings){
+            return settingsFragment;
+        } else{
+            return myTRUFragment;
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState){
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_ACTIVE_FRAGMENT_ID, activeFragmentId);
     }
 }

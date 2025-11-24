@@ -62,9 +62,7 @@ public class SGFragmnet extends Fragment
 
             Toast.makeText(getContext(), "Error: Course ID not found.", Toast.LENGTH_SHORT).show();
         }
-
-
-        //Adding a course
+//        //Adding a course
         add_sg_button = view.findViewById(R.id.add_sg_button);
         add_sg_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,6 +82,9 @@ public class SGFragmnet extends Fragment
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(!isAdded()){
+                            return;
+                        }
                         if(task.isSuccessful())
                         {
 

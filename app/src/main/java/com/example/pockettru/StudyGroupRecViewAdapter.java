@@ -1,5 +1,6 @@
 package com.example.pockettru;
 
+import android.transition.TransitionManager;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +16,6 @@ import java.util.List;
 public class StudyGroupRecViewAdapter extends RecyclerView.Adapter<StudyGroupRecViewAdapter.ViewHolder>
 {
     private ArrayList<StudyGroupModel> studyGroupList;
-
 
     public StudyGroupRecViewAdapter(ArrayList<StudyGroupModel> studyGroupList)
     {
