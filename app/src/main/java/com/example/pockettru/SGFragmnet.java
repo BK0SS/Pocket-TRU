@@ -41,7 +41,7 @@ public class SGFragmnet extends Fragment
     private StudyGroupRecViewAdapter adapter;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String courseId;
-    private Button add_sg_button;
+    private Button add_sg_button, bookmark_sg_button;
 
     //This cheks the bundle for course id from the other fragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,7 +60,7 @@ public class SGFragmnet extends Fragment
 
         recyclerView = view.findViewById(R.id.studygroup_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new StudyGroupRecViewAdapter(studyGroupList);
+        adapter = new StudyGroupRecViewAdapter(getContext(), studyGroupList);
 
         recyclerView.setAdapter(adapter);
 
@@ -78,6 +78,9 @@ public class SGFragmnet extends Fragment
                 dialog();
             }
         });
+        //bookmark button
+
+
 
         return view;
     }
@@ -104,6 +107,9 @@ public class SGFragmnet extends Fragment
                             for(QueryDocumentSnapshot document : task.getResult())
                             {
                                 StudyGroupModel groupModel = new StudyGroupModel(document.getString("author"), document.getString("date"), document.getString("time"), document.getString("description"));
+                                studyGroupList.add(groupModel);
+                                groupModel.setFirestoreDocumentId(document.getId());
+
                                 studyGroupList.add(groupModel);
                             }
                             adapter.notifyDataSetChanged();

@@ -6,15 +6,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Auth"
+    android:padding="16dp"
     android:orientation="vertical"
     android:gravity="center">
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@mipmap/ic_launcher"
+        android:layout_marginBottom="32dp"
+        android:contentDescription="@string/app_name" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_margin="2dp"
-        android:padding="2dp"
         android:gravity="center">
 
         <com.google.android.material.textfield.TextInputLayout
@@ -47,17 +53,25 @@
     <com.google.android.material.button.MaterialButton
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:text="Login"
         android:id="@+id/login_button"/>
     <com.google.android.material.button.MaterialButton
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:text="Register"
         android:id="@+id/goto_register_button"/>
+
     <com.google.android.material.textview.MaterialTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/colorPrimary"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:text="Forgot password?"
         android:id="@+id/password_reset"
         android:layout_margin="5dp"/>
