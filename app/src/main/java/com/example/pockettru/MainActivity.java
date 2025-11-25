@@ -23,17 +23,17 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
 public class MainActivity extends AppCompatActivity {
-    final Fragment wolfPackFragment = new WolfpackScheduleFragment();
-    final Fragment settingsFragment = new SettingsFragment();
-    final Fragment myTRUFragment = new MyTRUFragment();
-    final Fragment newsFragment = new NewsFragment();
-    final Fragment studyGroupsFragment = new StudyGroupsFragment();
+    Fragment wolfPackFragment;
+    Fragment settingsFragment;
+    Fragment myTRUFragment;
+    Fragment newsFragment;
+    Fragment studyGroupsFragment;
     final Fragment sgFragment = new SGFragmnet();
     final FragmentManager fm = getSupportFragmentManager();
     Fragment active;
 
     private static final String STATE_ACTIVE_FRAGMENT_ID = "active_fragment_id";
-    private int activeFragmentId;
+    private int activeFragmentId = R.id.navigation_mytru;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +43,8 @@ public class MainActivity extends AppCompatActivity {
         AppCompatDelegate.setDefaultNightMode(isDarkModeOn ?
                 AppCompatDelegate.MODE_NIGHT_YES :
                 AppCompatDelegate.MODE_NIGHT_NO);
+
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         splashScreen.setOnExitAnimationListener(splashScreenViewProvider -> {
                 final View iconView = splashScreenViewProvider.getIconView();
@@ -70,22 +70,43 @@ public class MainActivity extends AppCompatActivity {
                 iconView.startAnimation(rotateAnimation);
     });
 
+        setContentView(R.layout.activity_main);
+
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
 
         if(savedInstanceState != null){
             activeFragmentId = savedInstanceState.getInt(STATE_ACTIVE_FRAGMENT_ID, R.id.navigation_mytru);
-        } else{
-            activeFragmentId = R.id.navigation_mytru;
+            // Find existing fragments by their tags
+            myTRUFragment = fm.findFragmentByTag("1");
+            newsFragment = fm.findFragmentByTag("2");
+            studyGroupsFragment = fm.findFragmentByTag("3");
+            wolfPackFragment = fm.findFragmentByTag("4");
+            settingsFragment = fm.findFragmentByTag("5");
         }
 
-        fm.beginTransaction().add(R.id.fragment_container, settingsFragment, "5").hide(settingsFragment).commit();
-        fm.beginTransaction().add(R.id.fragment_container, wolfPackFragment, "4").hide(wolfPackFragment).commit();
-        fm.beginTransaction().add(R.id.fragment_container, studyGroupsFragment, "3").hide(studyGroupsFragment).commit();
-        fm.beginTransaction().add(R.id.fragment_container, newsFragment, "2").hide(newsFragment).commit();
-        fm.beginTransaction().add(R.id.fragment_container, myTRUFragment, "1").hide(myTRUFragment).commit();
+        // Only create and add fragments
+        if (myTRUFragment == null) {
+            myTRUFragment = new MyTRUFragment();
+            fm.beginTransaction().add(R.id.fragment_container, myTRUFragment, "1").hide(myTRUFragment).commit();
+        }
+        if (newsFragment == null) {
+            newsFragment = new NewsFragment();
+            fm.beginTransaction().add(R.id.fragment_container, newsFragment, "2").hide(newsFragment).commit();
+        }
+        if (studyGroupsFragment == null) {
+            studyGroupsFragment = new StudyGroupsFragment();
+            fm.beginTransaction().add(R.id.fragment_container, studyGroupsFragment, "3").hide(studyGroupsFragment).commit();
+        }
+        if (wolfPackFragment == null) {
+            wolfPackFragment = new WolfpackScheduleFragment();
+            fm.beginTransaction().add(R.id.fragment_container, wolfPackFragment, "4").hide(wolfPackFragment).commit();
+        }
+        if (settingsFragment == null) {
+            settingsFragment = new SettingsFragment();
+            fm.beginTransaction().add(R.id.fragment_container, settingsFragment, "5").hide(settingsFragment).commit();
+        }
 
         active = getFragmentById(activeFragmentId);
-        fm.beginTransaction().show(active).commit();
 
         bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -110,6 +131,13 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        // Set selected item and show the active fragment
+        // This needs to be done after the listener is set
+        if (active != null) {
+            fm.beginTransaction().show(active).commit();
+            bottomNav.setSelectedItemId(activeFragmentId);
+        }
 
     }
 

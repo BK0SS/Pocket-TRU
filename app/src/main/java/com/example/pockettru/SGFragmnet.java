@@ -1,5 +1,7 @@
 package com.example.pockettru;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
+import android.widget.DatePicker;
+import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,11 +23,15 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class SGFragmnet extends Fragment
 {
@@ -112,26 +120,64 @@ public class SGFragmnet extends Fragment
         View view = getLayoutInflater().inflate(R.layout.create_sg_dialog, null);
         MaterialAlertDialogBuilder alertDialog = new MaterialAlertDialogBuilder(getContext());
 
-        TextInputEditText author = view.findViewById(R.id.author_dialog);
-        TextInputEditText date = view.findViewById(R.id.date_dialog);
-        TextInputEditText time = view.findViewById(R.id.time_dialog);
-        TextInputEditText description = view.findViewById(R.id.description_dialog);
+        TextInputEditText author = view.findViewById(R.id.edit_text_author);
+        Button dateButton = view.findViewById(R.id.button_select_date);
+        Button timeButton = view.findViewById(R.id.button_select_time);
+        TextInputEditText description = view.findViewById(R.id.edit_text_description);
+
+        final Calendar calendar = Calendar.getInstance();
+
+        dateButton.setOnClickListener(v -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (view1, year, month, dayOfMonth) -> {
+                calendar.set(Calendar.YEAR, year);
+                calendar.set(Calendar.MONTH, month);
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                dateButton.setText(dateFormat.format(calendar.getTime()));
+            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+            datePickerDialog.show();
+        });
+
+        timeButton.setOnClickListener(v -> {
+            TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(), (view12, hourOfDay, minute) -> {
+                timeButton.setText(String.format("%02d:%02d", hourOfDay, minute));
+            }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
+            timePickerDialog.show();
+        });
+        // Get current user and set author field
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            author.setText(currentUser.getEmail());
+            author.setEnabled(false); // Make it unchangeable
+        }
 
         alertDialog.setTitle("Add Study Group");
         alertDialog.setView(view).setPositiveButton("Make", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 String authorText = author.getText().toString();
-                String dateText = date.getText().toString();
-                String timeText = time.getText().toString();
+                String dateText = dateButton.getText().toString();
+                String timeText = timeButton.getText().toString();
                 String descriptionText = description.getText().toString();
 
                 StudyGroupModel newGroup = new StudyGroupModel(authorText, dateText, timeText, descriptionText);
 
-                db.collection(courseId).add(newGroup);
-                studyGroupList.add(newGroup);
-                adapter.notifyItemInserted(studyGroupList.size() - 1);
-                Toast.makeText(getContext(), "Study group added!", Toast.LENGTH_SHORT).show();
+                // When adding a document to a collection that does not exist,
+                // Firestore automatically creates the collection.
+                db.collection(courseId).add(newGroup)
+                        .addOnCompleteListener(new OnCompleteListener() {
+                            @Override
+                            public void onComplete(@NonNull Task task) {
+                                if (task.isSuccessful()) {
+                                    studyGroupList.add(newGroup);
+                                    adapter.notifyItemInserted(studyGroupList.size() - 1);
+                                    Toast.makeText(getContext(), "Study group added!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(getContext(), "Failed to create study group.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+
             }
         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
                 @Override
@@ -139,9 +185,6 @@ public class SGFragmnet extends Fragment
                 dialogInterface.dismiss();
             }
         }).show();
-
-
-
 
     }
 }
