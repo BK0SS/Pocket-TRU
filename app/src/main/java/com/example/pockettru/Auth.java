@@ -67,7 +67,6 @@ public class Auth extends AppCompatActivity {
                 showForgotPasswordDialog();
             }
         });
-        // Login button click listener code for logging in
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,7 +84,6 @@ public class Auth extends AppCompatActivity {
             }
         });
 
-        // Register button click listener code for going to the register page
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

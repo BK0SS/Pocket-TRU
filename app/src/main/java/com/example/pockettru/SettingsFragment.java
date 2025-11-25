@@ -21,6 +21,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -33,12 +35,20 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SettingsFragment extends Fragment {
 
     private static final String PREFS_NAME = "ThemePref";
     private static final String KEY_IS_DARK_MODE = "isDarkModeOn";
     private MaterialTextView user_email;
     private FirebaseAuth mAuth;
+    private RecyclerView bookmarksRecyclerView;
+    private StudyGroupRecViewAdapter bookmarksAdapter;
+    private BookmarkDBHandler bookmarkDBHandler;
+    private List<StudyGroupModel> bookmarkedGroups;
+    private MaterialTextView bookmarksTitle, noBookmarksText;
 
     @Nullable
     @Override
@@ -59,6 +69,13 @@ public class SettingsFragment extends Fragment {
 
         Button change_email = view.findViewById(R.id.change_email_button);
 
+        bookmarksRecyclerView = view.findViewById(R.id.bookmarks_recycler_view);
+        bookmarksTitle = view.findViewById(R.id.bookmarks_title);
+        noBookmarksText = view.findViewById(R.id.text_no_bookmarks);
+        bookmarkDBHandler = new BookmarkDBHandler(getContext());
+
+        setupBookmarkRecyclerView();
+        loadBookmarks();
 
         boolean isDarkModeOn = sharedPreferences.getBoolean(KEY_IS_DARK_MODE, false);
         switchTheme.setChecked(isDarkModeOn);
@@ -69,6 +86,7 @@ public class SettingsFragment extends Fragment {
             editor.putBoolean(KEY_IS_DARK_MODE, isChecked);
             editor.apply();
 
+            //stack overflow
             int mode = isChecked ?
                     AppCompatDelegate.MODE_NIGHT_YES :
                     AppCompatDelegate.MODE_NIGHT_NO;
@@ -84,6 +102,18 @@ public class SettingsFragment extends Fragment {
                 startActivity(intent);
             }
 
+        });
+        user_email.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                new AlertDialog.Builder(getContext())
+                        .setTitle("From Bogdan")
+                        .setMessage("Developed with ❤️ for Melani")
+                        .setPositiveButton("Que bonita!", null)
+                        .show();
+                return true;
+            }
         });
         //delete profile
         deleteuser_button.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +132,40 @@ public class SettingsFragment extends Fragment {
         });
 
     }
+    public void onResume() {
+        super.onResume();
+        // Reload bookmarks every time the fragment becomes visible
 
+        if (bookmarkDBHandler != null) {
+            loadBookmarks();
+        }
+    }
+    private void setupBookmarkRecyclerView() {
+        bookmarkedGroups = new ArrayList<>();
+        bookmarksAdapter = new StudyGroupRecViewAdapter(getContext(), (ArrayList<StudyGroupModel>) bookmarkedGroups, true);
+        bookmarksRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        bookmarksRecyclerView.setAdapter(bookmarksAdapter);
+    }
+    private void loadBookmarks() {
+
+        bookmarkedGroups.clear();
+
+        List<StudyGroupModel> newBookmarks = bookmarkDBHandler.getAllStudyGroups();
+        bookmarkedGroups.addAll(newBookmarks);
+
+        bookmarksAdapter.notifyDataSetChanged();
+
+
+        if (bookmarkedGroups.isEmpty()) {
+            bookmarksTitle.setVisibility(View.GONE);
+            noBookmarksText.setVisibility(View.VISIBLE);
+        } else {
+            bookmarksTitle.setVisibility(View.VISIBLE);
+            noBookmarksText.setVisibility(View.GONE);
+        }
+    }
+
+    //found this code online it works perfect
     private void showChangeEmailDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Change Email");
@@ -165,7 +228,7 @@ public class SettingsFragment extends Fragment {
         user.verifyBeforeUpdateEmail(newEmail).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Toast.makeText(getContext(), "Verification email sent to " + newEmail + ". Please verify to complete the change.", Toast.LENGTH_LONG).show();
-                // Sign out the user to force re-login with the new email after verification
+                // Sign out the user
                 FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(getActivity(), Auth.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

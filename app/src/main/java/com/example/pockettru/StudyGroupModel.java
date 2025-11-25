@@ -2,6 +2,16 @@ package com.example.pockettru;
 
 public class StudyGroupModel
 {
+    private String firestoreDocumentId; // Add this field
+
+    // Add getter and setter for it
+    public String getFirestoreDocumentId() {
+        return firestoreDocumentId;
+    }
+
+    public void setFirestoreDocumentId(String firestoreDocumentId) {
+        this.firestoreDocumentId = firestoreDocumentId;
+    }
     private String author;
     private String date;
     private String time;
