@@ -1,4 +1,4 @@
-package com.example.pockettru;
+package com.comp3160.pockettru;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -21,18 +21,19 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.List;
+
 public class StudyGroupRecViewAdapter extends RecyclerView.Adapter<StudyGroupRecViewAdapter.ViewHolder>
 {
     private Context context;
     private ArrayList<StudyGroupModel> studyGroupList;
     private BookmarkDBHandler bookmarkDBHandler;
     private boolean isBookmarkMode = false;
-
-    public StudyGroupRecViewAdapter(Context context, ArrayList<StudyGroupModel> studyGroupList) {
+    private String collectionName;
+    public StudyGroupRecViewAdapter(Context context, ArrayList<StudyGroupModel> studyGroupList, String collectionName) { // <-- Modify constructor
         this.context = context;
         this.studyGroupList = studyGroupList;
         this.bookmarkDBHandler = new BookmarkDBHandler(context);
+        this.collectionName = collectionName; // <-- Initialize it
     }
 
 
@@ -164,7 +165,8 @@ public class StudyGroupRecViewAdapter extends RecyclerView.Adapter<StudyGroupRec
             return;
         }
 
-        FirebaseFirestore.getInstance().collection("study_groups").document(documentId)
+        // Use the dynamic collection name passed to the adapter
+        FirebaseFirestore.getInstance().collection(collectionName).document(documentId)
                 .delete()
                 .addOnSuccessListener(aVoid -> {
                     // Deletion successful

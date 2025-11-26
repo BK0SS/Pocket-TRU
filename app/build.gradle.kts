@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.pockettru"
+    namespace = "com.comp3160.pockettru"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.pockettru"
+        applicationId = "com.comp3160.pockettru"
         minSdk = 28
         targetSdk = 35
         versionCode = 1

@@ -1,4 +1,4 @@
-package com.example.pockettru;
+package com.comp3160.pockettru;
 
 public class StudyGroupModel
 {

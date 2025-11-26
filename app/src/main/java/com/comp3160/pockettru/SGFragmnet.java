@@ -1,4 +1,4 @@
-package com.example.pockettru;
+package com.comp3160.pockettru;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -9,12 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
-import android.widget.DatePicker;
-import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -60,7 +57,7 @@ public class SGFragmnet extends Fragment
 
         recyclerView = view.findViewById(R.id.studygroup_recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new StudyGroupRecViewAdapter(getContext(), studyGroupList);
+        adapter = new StudyGroupRecViewAdapter(getContext(), studyGroupList, courseId);
 
         recyclerView.setAdapter(adapter);
 
@@ -107,9 +104,7 @@ public class SGFragmnet extends Fragment
                             for(QueryDocumentSnapshot document : task.getResult())
                             {
                                 StudyGroupModel groupModel = new StudyGroupModel(document.getString("author"), document.getString("date"), document.getString("time"), document.getString("description"));
-                                studyGroupList.add(groupModel);
                                 groupModel.setFirestoreDocumentId(document.getId());
-
                                 studyGroupList.add(groupModel);
                             }
                             adapter.notifyDataSetChanged();
