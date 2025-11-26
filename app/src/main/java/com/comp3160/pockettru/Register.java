@@ -1,4 +1,4 @@
-package com.example.pockettru;
+package com.comp3160.pockettru;
 
 import android.content.Intent;
 import android.os.Bundle;

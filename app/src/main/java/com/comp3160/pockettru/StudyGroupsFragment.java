@@ -1,4 +1,4 @@
-package com.example.pockettru;
+package com.comp3160.pockettru;
 
 import android.os.Bundle;
 import android.util.Log;
