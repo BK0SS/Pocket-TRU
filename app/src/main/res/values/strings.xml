@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Pocket TRU</string>
     <string name="dark_mode">Dark Mode</string>
+    <string name="google_map_api_key">AIzaSyDYGF6X2H9lQB09kYGvgd2BlqU_CB7LyMg</string>
 </resources>

@@ -7,6 +7,47 @@
     tools:context=".StudyGroupsFragment"
     android:orientation="vertical">
 
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        app:cardBackgroundColor="@color/colorOnPrimary"
+        app:cardCornerRadius="12dp"
+        style="@style/ThemeOverlay.Material3.AutoCompleteTextView.OutlinedBox">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Welcome to our app!"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorPrimary" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/email_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="Find a study group for the one of the courses below or create a new one."
+                android:textAppearance="?attr/textAppearanceBodyLarge" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search_view"
         android:layout_width="match_parent"
@@ -22,5 +63,7 @@
         android:layout_height="match_parent"
         android:id="@+id/courselist_recyclerview"
         android:layout_margin="2dp"/>
+
+    </LinearLayout>
 
 </LinearLayout>

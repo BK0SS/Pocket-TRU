@@ -43,12 +43,12 @@ public class Auth extends AppCompatActivity {
             return;
         }
 
-        overridePendingTransition(R.anim.rotate1, R.anim.rotate1);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
+//        overridePendingTransition(R.anim.rotate1, R.anim.rotate1);
+//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+//            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+//            return insets;
+//        });
 
         Intent intent = new Intent(this, MainActivity.class);
         Intent registerIntent = new Intent(this, Register.class);

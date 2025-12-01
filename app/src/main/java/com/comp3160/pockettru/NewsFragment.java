@@ -44,4 +44,11 @@ public class NewsFragment extends Fragment {
         String wolfpackScheduleUrl = "https://theomega.news";
         omeganews_webview.loadUrl(wolfpackScheduleUrl);
     }
+
+    public void refresh(){
+        if (omeganews_webview != null){
+            String myTruUrl = "https://theomega.news";
+            omeganews_webview.loadUrl(myTruUrl);
+        }
+    }
 }

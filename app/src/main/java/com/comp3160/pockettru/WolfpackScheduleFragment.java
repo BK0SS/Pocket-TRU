@@ -43,4 +43,11 @@ public class WolfpackScheduleFragment extends Fragment {
         String wolfpackScheduleUrl = "https://gowolfpack.ca/calendar";
         wolfpack_webview.loadUrl(wolfpackScheduleUrl);
     }
+
+    public void refresh(){
+        if (wolfpack_webview != null){
+            String myTruUrl = "https://gowolfpack.ca/calendar";
+            wolfpack_webview.loadUrl(myTruUrl);
+        }
+    }
 }

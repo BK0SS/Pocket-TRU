@@ -14,6 +14,8 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
@@ -28,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     Fragment active;
 
     private static final String STATE_ACTIVE_FRAGMENT_ID = "active_fragment_id";
-    private int activeFragmentId = R.id.navigation_mytru;
+    private int activeFragmentId = R.id.navigation_studygroups;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +121,10 @@ public class MainActivity extends AppCompatActivity {
                 } else{
                     if (active instanceof  MyTRUFragment){
                         ((MyTRUFragment) active).refresh();
+                    }else if(active instanceof  NewsFragment){
+                        ((NewsFragment) active).refresh();
+                    }else if(active instanceof WolfpackScheduleFragment){
+                        ((WolfpackScheduleFragment) active).refresh();
                     }else if( active instanceof StudyGroupsFragment){
                         fm.beginTransaction().detach(active).attach(active).commit();
                     }
@@ -137,8 +143,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private Fragment getFragmentById(int id){
-        if(id == R.id.navigation_studygroups){
-            return studyGroupsFragment;
+        if(id == R.id.navigation_mytru){
+            return myTRUFragment;
         }else if(id == R.id.navigation_news){
             return newsFragment;
         }else if(id == R.id.navigation_wolfpack){
@@ -146,7 +152,7 @@ public class MainActivity extends AppCompatActivity {
         }else if(id == R.id.navigation_settings){
             return settingsFragment;
         } else{
-            return myTRUFragment;
+            return studyGroupsFragment;
         }
     }
 
@@ -155,4 +161,5 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         outState.putInt(STATE_ACTIVE_FRAGMENT_ID, activeFragmentId);
     }
+
 }

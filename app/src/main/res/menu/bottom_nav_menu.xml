@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/navigation_mytru"
-        android:icon="@drawable/homepageicon"
-        android:title="myTRU" />
-    <item
         android:id="@+id/navigation_studygroups"
-        android:icon="@drawable/studygroupicon"
+        android:icon="@drawable/homepageicon"
         android:title="StudyGroups" />
+    <item
+        android:id="@+id/navigation_mytru"
+        android:icon="@drawable/studygroupicon"
+        android:title="myTRU" />
     <item
         android:id="@+id/navigation_news"
         android:icon="@drawable/newspapericon"

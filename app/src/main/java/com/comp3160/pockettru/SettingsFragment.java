@@ -4,6 +4,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -18,11 +21,23 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.LatLng;
+
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.button.MaterialButtonToggleGroup;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.auth.AuthCredential;
@@ -30,10 +45,22 @@ import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.MarkerOptions;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class SettingsFragment extends Fragment {
+public class SettingsFragment extends Fragment implements OnMapReadyCallback {
+
+    private final List<Marker> buildingMarkers = new ArrayList<>();
+    private final List<Marker> foodMarkers = new ArrayList<>();
+    private final List<Marker> parkingMarkers = new ArrayList<>();
 
     private static final String PREFS_NAME = "ThemePref";
     private static final String KEY_IS_DARK_MODE = "isDarkModeOn";
@@ -53,6 +80,18 @@ public class SettingsFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+        if (isGooglePlayServicesAvailable()){
+            SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+
+            if(mapFragment != null){
+                mapFragment.getMapAsync(this);
+            }
+        }else{
+            Toast.makeText(getContext(), "Google Play services are not available.", Toast.LENGTH_LONG).show();
+        }
+
+
         mAuth = FirebaseAuth.getInstance();
         user_email = view.findViewById(R.id.email_text);
         user_email.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
@@ -68,6 +107,37 @@ public class SettingsFragment extends Fragment {
         bookmarksTitle = view.findViewById(R.id.bookmarks_title);
         noBookmarksText = view.findViewById(R.id.text_no_bookmarks);
         bookmarkDBHandler = new BookmarkDBHandler(getContext());
+
+        Button btnShowAll = view.findViewById(R.id.btn_show_all);
+        Button btnShowBuildings = view.findViewById(R.id.btn_buildings);
+        Button btnShowFoodServices = view.findViewById(R.id.btn_food_services);
+        Button btnShowParking = view.findViewById(R.id.btn_parking);
+
+        btnShowAll.setOnClickListener(v -> {
+            toggleMarkers(buildingMarkers, true);
+            toggleMarkers(foodMarkers, true);
+            toggleMarkers(parkingMarkers, true);
+        });
+
+        btnShowBuildings.setOnClickListener(v -> {
+            toggleMarkers(buildingMarkers, true);
+            toggleMarkers(foodMarkers, false);
+            toggleMarkers(parkingMarkers, false);
+        });
+
+        btnShowFoodServices.setOnClickListener(view1 -> {
+            toggleMarkers(buildingMarkers, false);
+            toggleMarkers(foodMarkers, true);
+            toggleMarkers(parkingMarkers, false);
+        });
+
+        btnShowParking.setOnClickListener(view1 -> {
+            toggleMarkers(buildingMarkers, false);
+            toggleMarkers(foodMarkers, false);
+            toggleMarkers(parkingMarkers, true);
+        });
+
+        ((MaterialButtonToggleGroup) view.findViewById(R.id.map_toggles)).check(R.id.btn_show_all);
 
         setupBookmarkRecyclerView();
         loadBookmarks();
@@ -104,8 +174,8 @@ public class SettingsFragment extends Fragment {
 
                 new AlertDialog.Builder(getContext())
                         .setTitle("From Bogdan")
-                        .setMessage("Developed with ❤️ for Melani")
-                        .setPositiveButton("Que bonita!", null)
+                        .setMessage("Developed with ❤️")
+                        .setPositiveButton("❤️", null)
                         .show();
                 return true;
             }
@@ -287,6 +357,134 @@ public class SettingsFragment extends Fragment {
                 Toast.makeText(getContext(), "Re-authentication failed. Please check your password.", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private boolean isGooglePlayServicesAvailable(){
+        int availability = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getContext());
+        return availability == ConnectionResult.SUCCESS;
+    }
+
+    @Override
+    public void onMapReady(@NonNull GoogleMap map){
+        try{
+            boolean succes = map.setMapStyle(MapStyleOptions.loadRawResourceStyle(requireContext(), R.raw.map_style));
+            if(!succes){
+                Log.e("Settings Fragment", "Style failed");
+            }
+        }catch (Exception e){
+            Log.e("Settings Fragment", "Can't find style", e);
+        }
+
+        BitmapDescriptor buidlingIcon = bitmapDescriptorFromVector(R.drawable.buildings, 100, 100);
+        BitmapDescriptor foodIcon = bitmapDescriptorFromVector(R.drawable.food, 80, 80);
+        BitmapDescriptor parkingIcon = bitmapDescriptorFromVector(R.drawable.parking, 100, 100);
+
+
+        LatLng southWest = new LatLng(50.658, -120.375);
+        LatLng northEast = new LatLng(50.678, -120.355);
+        LatLngBounds bounds = new LatLngBounds(southWest, northEast);
+
+        map.setLatLngBoundsForCameraTarget(bounds);
+        map.setMinZoomPreference(15);
+        map.setMaxZoomPreference(17);
+
+        LatLng location = new LatLng(50.6725, -120.3660);
+
+        buildingMarkers.clear();
+        foodMarkers.clear();
+        parkingMarkers.clear();
+
+        LatLng om = new LatLng(50.671162,-120.361902);
+        LatLng cac = new LatLng(50.672845862350464, -120.36647731601178);
+        LatLng hol = new LatLng(50.67207500236342, -120.36500406533493);
+        LatLng ib = new LatLng(50.67257481674408, -120.36412591376477);
+        LatLng sb = new LatLng(50.66924877948645, -120.36237668737427);
+        LatLng nb = new LatLng(50.66978732976576, -120.36152706776068);
+        LatLng ol = new LatLng(50.67015580912266, -120.36148273297246);
+        LatLng ae = new LatLng(50.67321319092225, -120.36436907602054);
+        LatLng truGym = new LatLng(50.66961419430688, -120.36419362561185);
+
+        LatLng starbucks = new LatLng(50.67150757712336, -120.3632749797488);
+        LatLng scratchcafe = new LatLng(50.67011417566106, -120.36242822160033);
+        LatLng timHortons = new LatLng(50.67195962426875, -120.36510368602853);
+        LatLng theDen = new LatLng(50.67316196925504, -120.3666123609505);
+        LatLng subway = new LatLng(50.67260230189388, -120.36378458302282);
+
+
+        LatLng parkingH = new LatLng(50.673963849328686, -120.3660377804864);
+        LatLng parkingN = new LatLng(50.67440128241239, -120.36843095933865);
+        LatLng parkingC = new LatLng(50.67024054502503, -120.36330008557559);
+        LatLng parkingS = new LatLng(50.668721243820826, -120.36304447504219);
+
+        LatLng writingCenter = new LatLng(50.6709371668854, -120.36266454164269);
+        LatLng makerspace = new LatLng(50.67194281448611, -120.36557498153613);
+
+
+        //Buildings
+        buildingMarkers.add(map.addMarker(new MarkerOptions().position(om).title("Old Main").icon(buidlingIcon)));
+        buildingMarkers.add(map.addMarker(new MarkerOptions().position(cac).title("Campus Activity Center").icon(buidlingIcon)));
+        buildingMarkers.add(map.addMarker(new MarkerOptions().position(hol).title("House of Learning").icon(buidlingIcon)));
+        buildingMarkers.add(map.addMarker(new MarkerOptions().position(ib).title("International Building").icon(buidlingIcon)));
+        buildingMarkers.add(map.addMarker(new MarkerOptions().position(sb).title("Science Building").icon(buidlingIcon)));
+        buildingMarkers.add(map.addMarker(new MarkerOptions().position(nb).title("Nursing Building").icon(buidlingIcon)));
+        buildingMarkers.add(map.addMarker(new MarkerOptions().position(ol).title("OLARA").icon(buidlingIcon)));
+        buildingMarkers.add(map.addMarker(new MarkerOptions().position(ae).title("Arts and Educations").icon(buidlingIcon)));
+        buildingMarkers.add(map.addMarker(new MarkerOptions().position(truGym).title("TRU Gym").icon(buidlingIcon)));
+
+
+
+        //Food Services
+        foodMarkers.add(map.addMarker(new MarkerOptions().position(starbucks).title("Starbucks").icon(foodIcon)));
+        foodMarkers.add(map.addMarker(new MarkerOptions().position(scratchcafe).title("Scratch Café").icon(foodIcon)));
+        foodMarkers.add(map.addMarker(new MarkerOptions().position(timHortons).title("Tim Hortons").icon(foodIcon)));
+        foodMarkers.add(map.addMarker(new MarkerOptions().position(theDen).title("The Den").icon(foodIcon)));
+        foodMarkers.add(map.addMarker(new MarkerOptions().position(subway).title("Subway").icon(foodIcon)));
+
+
+
+        //Parking Lots
+        parkingMarkers.add(map.addMarker(new MarkerOptions().position(parkingC).title("Parking Lot C").icon(parkingIcon)));
+        parkingMarkers.add(map.addMarker(new MarkerOptions().position(parkingH).title("Parking Lot H").icon(parkingIcon)));
+        parkingMarkers.add(map.addMarker(new MarkerOptions().position(parkingN).title("Parking Lot N").icon(parkingIcon)));
+        parkingMarkers.add(map.addMarker(new MarkerOptions().position(parkingS).title("Parking Lot S").icon(parkingIcon)));
+
+
+
+        //Student Services
+        parkingMarkers.add(map.addMarker(new MarkerOptions().position(writingCenter).title("Writing Center").icon(parkingIcon)));
+        parkingMarkers.add(map.addMarker(new MarkerOptions().position(makerspace).title("Makerspace").icon(parkingIcon)));
+
+
+
+
+        CameraPosition cameraPosition = new CameraPosition.Builder().target(location).zoom(16).tilt(20).build();
+
+
+        map.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+        map.getUiSettings().setZoomControlsEnabled(false);
+        toggleMarkers(buildingMarkers, true);
+        toggleMarkers(foodMarkers, true);
+        toggleMarkers(parkingMarkers, true);
+
+//        map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+    }
+
+    private void toggleMarkers(List<Marker> markers, boolean isVisible){
+        for(Marker marker : markers){
+            marker.setVisible(isVisible);
+        }
+    }
+
+    private BitmapDescriptor bitmapDescriptorFromVector(int vectorResId, int width, int height){
+        Drawable vectorDrawable = ContextCompat.getDrawable(requireContext(), vectorResId);
+        if(vectorDrawable == null)
+            return null;
+        vectorDrawable.setBounds(0, 0, width, height);
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 }
 
